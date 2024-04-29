@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favorite Movies</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .movie {
+            display: inline-block;
+            margin: 10px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            transition: box-shadow 0.3s ease;
+        }
+        .movie:hover {
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .movie img {
+            width: 150px;
+            height: auto;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .movie-info {
+            margin-top: 10px;
+            text-align: left;
+        }
+        .movie-info p {
+            margin: 5px 0;
+        }
+        .movie button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .movie button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Bar -->
+        <nav>
+            <div>
+                <!-- Display current user information -->
+                <span>Current User: {{ user_id }}</span>
+                <!-- Logout button -->
+                <a href="/logout">Logout</a>
+            </div>
+        </nav>
+
+        <h1>Favorite Movies</h1>
+
+        <!-- Movie List -->
+        <div id="movie-list">
+            <!-- Movies will be displayed here -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch("/api/favorite_movies")
+                .then(response => response.json())
+                .then(movies => renderFavoriteMovieList(movies))
+                .catch(error => console.error("Error fetching favorite movies:", error));
+        });
+
+        function renderFavoriteMovieList(movies) {
+            const movieListElement = document.getElementById("movie-list");
+            movieListElement.innerHTML = ""; // Clear the list
+
+            movies.forEach(movie => {
+                const movieElement = document.createElement("div");
+                movieElement.classList.add("movie");
+
+                const posterElement = document.createElement("img");
+                posterElement.src = movie[5]; // Modify to the movie poster image link
+                posterElement.alt = movie[1]; // Modify to the movie title
+                posterElement.addEventListener("click", function() {
+                    // Clicking on the poster image redirects to the movie detail page
+                    window.location.href = `/movie_detail/${movie[0]}`; // Using dynamic routing
+                });
+                movieElement.appendChild(posterElement);
+
+                // Add actor and author information
+                const infoElement = document.createElement("div");
+                infoElement.classList.add("movie-info");
+                infoElement.innerHTML = `
+                    <p><strong>Title:</strong> ${movie[1]}</p>
+                    <p><strong>Actors:</strong> ${movie[3]}</p>
+                    <p><strong>Author:</strong> ${movie[2]}</p>
+                `;
+                movieElement.appendChild(infoElement);
+
+                const buttonElement = document.createElement("button");
+                buttonElement.textContent = "Remove from Favorites";
+                buttonElement.addEventListener("click", function() {
+                    // Send a request to the backend to remove the favorite movie
+                    fetch(`/api/favorite_movies/${movie[0]}`, { method: "DELETE" })
+                        .then(response => {
+                            if (response.ok) {
+                                alert(`Successfully removed ${movie[1]} from favorites!`);
+                                // Refresh the page to update the favorites list
+                                window.location.reload();
+                            } else {
+                                alert(`Failed to remove ${movie[1]} from favorites!`);
+                            }
+                        })
+                        .catch(error => console.error(`Error removing ${movie.title} from favorites:`, error));
+                });
+                movieElement.appendChild(buttonElement);
+
+                movieListElement.appendChild(movieElement);
+            });
+        }
+    </script>
+</body>
+</html>

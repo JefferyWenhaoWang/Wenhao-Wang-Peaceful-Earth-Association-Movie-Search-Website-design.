@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Details and Comments</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            color: #343a40;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        p {
+            margin: 10px 0;
+            text-align: justify;
+        }
+        #comment-input {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: vertical;
+        }
+        button[type="submit"] {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        #comments-list {
+            margin-top: 20px;
+        }
+        .comment {
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Movie Details and Comments</h1>
+
+        <div id="movie-detail">
+            <!-- Movie details will be displayed here -->
+        </div>
+
+        <div id="comment-section">
+            <h3>Comments</h3>
+            <div id="comments-list">
+                <!-- Movie comments will be displayed here -->
+            </div>
+        </div>
+
+        <form id="comment-form">
+            <textarea id="comment-input" rows="4" placeholder="Enter your comment"></textarea><br>
+            <button type="submit">Submit Comment</button>
+        </form>
+    </div>
+
+    <script>
+        // Get movie details and comments from session storage
+        const movieDetail = JSON.parse('{{ session["movie"] | tojson | safe }}');
+        const movieComments = JSON.parse('{{ session["comments"] | tojson | safe }}');
+
+        // Render movie details
+        const movieDetailElement = document.getElementById("movie-detail");
+        movieDetailElement.innerHTML = `
+            <h2>${movieDetail.title}</h2>
+            <img src="${movieDetail.img}" alt="${movieDetail.title}">
+            <h3>Director: ${movieDetail.director}</h3>
+            <h3>Actors: ${movieDetail.actors}</h3>
+            <p>Release Date: ${movieDetail.release_date}</p>
+            <p>Description: ${movieDetail.description}</p>
+        `;
+
+        // Render movie comments
+        const commentsList = document.getElementById("comments-list");
+        movieComments.forEach(comment => {
+            const commentElement = document.createElement("div");
+            commentElement.classList.add("comment");
+            commentElement.innerHTML = `<strong>${comment.github_user_id}:</strong> ${comment.comment}`;
+            commentsList.appendChild(commentElement);
+        });
+
+        // Get comment form and input
+        const commentForm = document.getElementById("comment-form");
+        const commentInput = document.getElementById("comment-input");
+
+        // Listen for form submission
+        commentForm.addEventListener("submit", (event) => {
+            event.preventDefault(); // Prevent default form submission behavior
+
+            // Get the entered comment text
+            const commentText = commentInput.value.trim();
+
+            // If comment text is not empty, send comment to backend
+            if (commentText !== "") {
+                sendComment(commentText);
+            }
+        });
+
+        // Send comment to backend
+        function sendComment(commentText) {
+            // Use fetch API to send a POST request to the backend
+            fetch(`/api/movies/${movieDetail.id}/comments`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    comment: commentText
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Reload the page after successful comment to update the comments list
+                    window.location.reload();
+                } else {
+                    console.error("Failed to send comment:", response.statusText);
+                }
+            })
+            .catch(error => {
+                console.error("Error sending comment:", error);
+            });
+        }
+    </script>
+</body>
+</html>

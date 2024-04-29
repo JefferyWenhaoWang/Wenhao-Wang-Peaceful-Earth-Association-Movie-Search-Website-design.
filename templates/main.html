@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .movie {
+            display: inline-block;
+            margin: 10px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            transition: box-shadow 0.3s ease;
+        }
+        .movie:hover {
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .movie img {
+            width: 150px;
+            height: 250px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .movie-info {
+            margin-top: 10px;
+            text-align: left;
+        }
+        .movie-info p {
+            margin: 5px 0;
+        }
+        .movie button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .movie button:hover {
+            background-color: #0056b3;
+        }
+        .logout-container {
+            text-align: right;
+            margin-bottom: 10px;
+        }
+        .logout-container a {
+            color: #007bff;
+            text-decoration: none;
+            margin-left: 10px;
+        }
+
+        .movie-list {
+            display: flex;
+            flex-wrap: wrap; /* 允许小方格自动换行 */
+            justify-content: center; /* 将小方格水平居中 */
+        }
+
+        .movie {
+            margin: 10px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            transition: box-shadow 0.3s ease;
+        }
+
+        /* 自定义选择框样式 */
+        .custom-select {
+            position: relative;
+            width: 250px; /* 设置选择框的宽度 */
+        }
+
+        .custom-select select {
+            display: none; /* 隐藏默认的选择框 */
+        }
+
+        .custom-select::after {
+            content: '\25BC'; /* 使用 Unicode 下三角符号表示向下箭头 */
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: #007bff; /* 设置箭头颜色为蓝色 */
+        }
+
+        .custom-select select {
+            -webkit-appearance: none; /* 隐藏 Webkit 默认的样式 */
+            -moz-appearance: none; /* 隐藏 Firefox 默认的样式 */
+            appearance: none; /* 隐藏默认的样式 */
+            width: 100%;
+            padding: 15px; /* 增大选择框的内边距 */
+            border: 2px solid #007bff; /* 设置边框为蓝色 */
+            border-radius: 8px; /* 设置边框圆角 */
+            background-color: #ffffff; /* 设置背景颜色为白色 */
+            cursor: pointer;
+            font-size: 16px; /* 设置字体大小 */
+            color: #007bff; /* 设置文本颜色为蓝色 */
+        }
+
+        .custom-select select:focus {
+            outline: none; /* 移除选择框获取焦点时的默认边框样式 */
+        }
+
+        .custom-select select option {
+            padding: 10px;
+            font-size: 16px; /* 设置下拉选项的字体大小 */
+        }
+
+        .custom-select select option:hover {
+            background-color: #f0f0f0; /* 鼠标悬停时的背景颜色 */
+        }
+
+        /* 搜索框样式 */
+        .search-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 300px;
+            padding: 10px;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        .search-button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-button:hover {
+            background-color: #0056b3;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logout-container">
+            <span>Current User: {{ user_id }}</span>
+            <a href="/logout">Logout</a>
+            <button onclick="viewFavoriteMovies()">View Favorite Movies</button> <!-- New Button -->
+        </div>
+        <h1>Movie Search</h1>
+
+        <!-- Category Selector -->
+        <select id="category-selector" class="custom-select" onchange="searchByCategory()">
+            <option value="">Select Category</option>
+            <option value="Romance">Romance</option>
+            <option value="Action">Action</option>
+            <option value="History">History</option>
+        </select>
+
+        <!-- Search Box -->
+        <div class="search-container">
+            <input type="text" id="search-input" class="search-input" placeholder="Search by keyword">
+            <button onclick="searchByKeyword()" class="search-button">Search</button>
+        </div>
+
+        <!-- Movie List -->
+        <div id="movie-list" class="movie-list">
+            <!-- Movies will be displayed here -->
+        </div>
+    </div>
+
+    <script>
+        // Request backend to get the movie list
+        fetch("/api/movies")
+            .then(response => response.json())
+            .then(movies => renderMovieList(movies))
+            .catch(error => console.error("Error fetching movies:", error));
+
+        // Render movie list
+        function renderMovieList(movies) {
+            const movieListElement = document.getElementById("movie-list");
+            movieListElement.innerHTML = ""; // Clear the list
+
+            movies.forEach(movie => {
+                const movieElement = document.createElement("div");
+                movieElement.classList.add("movie");
+
+                const posterElement = document.createElement("img");
+                posterElement.src = movie[5]; // Change to index 5 data, i.e., poster image link
+                posterElement.alt = movie[1]; // Change to index 1 data, i.e., movie title
+                posterElement.addEventListener("click", function() {
+                    // Clicking on the poster image redirects to the movie detail page
+                    window.location.href = `/movie_detail/${movie[0]}`; // Using dynamic routing
+                });
+                movieElement.appendChild(posterElement);
+
+                // Add actor and director information
+                const infoElement = document.createElement("div");
+                infoElement.classList.add("movie-info");
+                infoElement.innerHTML = `
+                    <p><strong>Title:</strong> ${movie[1]}</p>
+                    <p><strong>Actors:</strong> ${movie[3]}</p>
+                    <p><strong>Director:</strong> ${movie[2]}</p>
+                `;
+                movieElement.appendChild(infoElement);
+
+                const buttonElement = document.createElement("button");
+                buttonElement.textContent = "Favorite";
+                buttonElement.addEventListener("click", function() {
+                    // TODO: Send favorite movie request to the backend
+                    fetch(`/api/movies/${movie[0]}/favorite`, { method: "POST" })
+                        .then(response => {
+                            if (response.ok) {
+                                alert(`Successfully favorited ${movie[1]}!`);
+                            } else {
+                                alert(`Failed to favorite ${movie[1]}!`);
+                            }
+                        })
+                        .catch(error => console.error(`Error favoriting ${movie[1]}:`, error));
+                });
+                movieElement.appendChild(buttonElement);
+
+                movieListElement.appendChild(movieElement);
+            });
+        }
+
+        // New function to search movies by category
+        function searchByCategory() {
+            const selectedCategory = document.getElementById("category-selector").value;
+            if (selectedCategory) {
+                fetch(`/api/movies/category/${selectedCategory}`)
+                    .then(response => response.json())
+                    .then(movies => renderMovieList(movies))
+                    .catch(error => console.error("Error fetching movies by category:", error));
+            } else {
+                // If no category is selected, show all movies
+                fetch("/api/movies")
+                    .then(response => response.json())
+                    .then(movies => renderMovieList(movies))
+                    .catch(error => console.error("Error fetching movies:", error));
+            }
+        }
+
+        // Function to search movies by keyword
+        function searchByKeyword() {
+            const keyword = document.getElementById("search-input").value.trim().toLowerCase();
+            if (keyword !== "") {
+                fetch(`/api/movies/search/${keyword}`)
+                    .then(response => response.json())
+                    .then(movies => renderMovieList(movies))
+                    .catch(error => console.error("Error fetching movies by keyword:", error));
+            } else {
+                alert("Please enter a keyword to search.");
+            }
+        }
+
+        // Get movie details and comments
+        function getMovieDetailAndComments(movieId) {
+            fetch(`/api/movies/${movieId}`)
+                .then(response => response.json())
+                .then(movie => {
+                    sessionStorage.setItem('movieDetail', JSON.stringify(movie)); // Store movie details in session storage
+                    return fetch(`/api/movies/${movieId}/comments`);
+                })
+                .then(response => response.json())
+                .then(comments => {
+                    sessionStorage.setItem('movieComments', JSON.stringify(comments)); // Store movie comments in session storage
+                    window.open('movie_detail.html', '_blank'); // Open movie detail page in a new tab
+                })
+                .catch(error => console.error("Error fetching movie detail and comments:", error));
+        }
+
+        // New function to navigate to favorite movies page
+        function viewFavoriteMovies() {
+            window.location.href = '/favorite_movies';
+        }
+    </script>
+</body>
+</html>
