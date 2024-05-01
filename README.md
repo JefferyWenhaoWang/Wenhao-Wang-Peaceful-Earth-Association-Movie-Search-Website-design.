@@ -1,43 +1,4 @@
-# GitHub-Login
-Example application for login with GitHub by GitHub-Flask
 
-## Online Demo
-https://helloflask.pythonanywhere.com
-
-## Installation
-
-```
-$ git clone https://github.com/helloflask/github-login
-$ cd github-login
-```
-
-## Register Your OAuth Application on GitHub
-
-Go to https://github.com/settings/applications/new
-
-Fill the form, then you will get your Client ID and Client Secret, write them into
-app.py:
-
-```python
-app.config['GITHUB_CLIENT_ID'] = 'your_client_id'
-app.config['GITHUB_CLIENT_SECRET'] = 'your_clent_secret'
-
-```
-*Warning: You normally need to save this values as enviroment variable in production.*
-
-## Run
-
-Just excute:
-```
-$ flask run
-```
-Then go to http://localhost:5000
-
-
-# For Readers of Hello, Flask!
-
-Online Demo
-https://youtu.be/JfAtAOXURyQ
 
 Overview The Movie Explorer Website is a web-based platform designed to assist users in finding, reviewing, and engaging with movies across various genres. Users can search for movies by category, leave comments, and add films to a personalized favorites list.
 
