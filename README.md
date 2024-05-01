@@ -30,4 +30,4 @@ Session Management and Personalization: I configured Flask to effectively manage
 
 Database Connectivity and Management: I engineered the database connectivity using SQLAlchemy, facilitating robust data management and manipulation. I automated repetitive database tasks such as migrations and seeding, which enhanced my development efficiency.
 
-User Feedback and Interaction: I designed interactive elements such as movie favoriting and commenting systems using JavaScript and AJAX, providing instant feedback and interactive experiences without page reloads.
+User Feedback and Interaction: I designed interactive elements such as movie favoriting and commenting systems using HDML, providing instant feedback and interactive experiences without page reloads.
